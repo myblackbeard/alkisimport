@@ -7,6 +7,9 @@ SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 
 SELECT 'Sonstige Bauwerke oder Einrichtungen werden verarbeitet.';
 
+REFRESH MATERIALIZED VIEW ap_pto_unnested;
+REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
+
 -- Flächen
 INSERT INTO po_polygons(gml_id,thema,layer,polygon,signaturnummer,modell)
 SELECT
@@ -258,8 +261,8 @@ FROM (
 		drehwinkel,horizontaleausrichtung,vertikaleausrichtung,skalierung,fontsperrung,
 		coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 	FROM ax_sonstigesbauwerkodersonstigeeinrichtung o
-	LEFT OUTER JOIN ap_pto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.art='BWF' AND t.endet IS NULL
-	LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art='BWF' AND d.endet IS NULL
+	LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id LIKE t.dientzurdarstellungvon_unnested AND t.art='BWF' AND t.endet IS NULL
+	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id LIKE d.dientzurdarstellungvon_unnested AND d.art='BWF' AND d.endet IS NULL
 	WHERE o.endet IS NULL
 ) AS n WHERE NOT text IS NULL AND NOT signaturnummer IS NULL;
 

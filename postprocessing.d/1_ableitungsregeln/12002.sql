@@ -7,6 +7,9 @@ SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 
 SELECT 'Lagebezeichnungen mit Hausnummer werden verarbeitet.';
 
+
+REFRESH MATERIALIZED VIEW ap_pto_unnested;
+REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
 -- mit Hausnummer, Ortsteil
 SELECT ' Ortsteil verarbeitet.';
 INSERT INTO po_labels(gml_id,thema,layer,point,text,signaturnummer,drehwinkel,horizontaleausrichtung,vertikaleausrichtung,skalierung,fontsperrung,modell)
@@ -97,8 +100,8 @@ FROM (
 		coalesce(tx.advstandardmodell||tx.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 	FROM ax_lagebezeichnungmithausnummer o
 	LEFT OUTER JOIN po_zeigtauf_hausnummer gt ON o.gml_id=gt.zeigtauf
-	LEFT OUTER JOIN ap_pto tx ON ARRAY[o.gml_id] <@ tx.dientzurdarstellungvon AND tx.endet IS NULL AND tx.art='HNR'
-	LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.endet IS NULL AND d.art='HNR'
+	LEFT OUTER JOIN ap_pto_unnested tx ON o.gml_id LIKE tx.dientzurdarstellungvon_unnested AND tx.endet IS NULL AND tx.art='HNR'
+	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id LIKE d.dientzurdarstellungvon_unnested AND d.endet IS NULL AND d.art='HNR'
 	WHERE o.endet IS NULL AND (gt.zeigtauf IS NOT NULL OR o.gml_id LIKE 'DEBY%')
 ) AS foo
 WHERE text IS NOT NULL;
