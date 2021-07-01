@@ -22474,3 +22474,53 @@ INSERT INTO ks_artderfestlegung_bauraumoderbauordnungsrecht (wert,beschreibung,d
 
 
 END;
+
+
+-- create views and indexes using unnested columns instead of arrays for faster join capabilities
+-- create trigger functions for the materialized views to refresh them when target table is updated
+
+-- ap_pto table
+CREATE MATERIALIZED VIEW ap_pto_unnested AS 
+     SELECT a.*, u.dientzurdarstellungvon::text AS dientzurdarstellungvon_unnested 
+     FROM ap_pto a 
+     JOIN (SELECT ogc_fid, unnest(dientzurdarstellungvon) AS dientzurdarstellungvon FROM ap_pto) u on a.ogc_fid = u.ogc_fid;
+
+CREATE INDEX ix_ogc_fid_ap_pto_unnested ON ap_pto_unnested(ogc_fid);
+CREATE INDEX ix_endet_ap_pto_unnested ON ap_pto_unnested(endet);
+CREATE INDEX ix_art_ap_pto_unnested ON ap_pto_unnested(art);
+CREATE INDEX ix_schriftinhalt_ap_pto_unnested ON ap_pto_unnested(schriftinhalt);
+
+CREATE OR REPLACE FUNCTION tg_refresh_ap_pto_unnested()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW ap_pto_unnested;
+    RETURN NULL;
+END;
+$$;
+
+CREATE TRIGGER tg_refresh_ap_pto_unnested AFTER INSERT OR UPDATE OR DELETE
+ON ap_pto
+FOR EACH STATEMENT EXECUTE PROCEDURE tg_refresh_ap_pto_unnested();
+
+-- ap_darstellung table
+CREATE MATERIALIZED VIEW ap_darstellung_unnested AS
+     SELECT a.*, u.dientzurdarstellungvon::text AS dientzurdarstellungvon_unnested 
+     FROM ap_darstellung a JOIN (SELECT ogc_fid, unnest(dientzurdarstellungvon) AS dientzurdarstellungvon FROM ap_darstellung) u ON a.ogc_fid = u.ogc_fid;
+
+CREATE INDEX ix_ogc_fid_ap_darstellung_unnested ON ap_darstellung_unnested(ogc_fid);
+CREATE INDEX ix_gml_id_ap_darstellung_unnested ON ap_darstellung_unnested(gml_id);
+CREATE INDEX ix_endet_ap_darstellung_unnested ON ap_darstellung_unnested(endet);
+CREATE INDEX ix_art_ap_darstellung_unnested ON ap_darstellung_unnested(art);
+
+
+CREATE OR REPLACE FUNCTION tg_refresh_ap_darstellung_unnested()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+    REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
+    RETURN NULL;
+END;
+$$;
+
+CREATE TRIGGER tg_refresh_ap_darstellung_unnested AFTER INSERT OR UPDATE OR DELETE
+ON ap_darstellung
+FOR EACH STATEMENT EXECUTE PROCEDURE tg_refresh_ap_darstellung_unnested();
