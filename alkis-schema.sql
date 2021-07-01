@@ -22490,17 +22490,17 @@ CREATE INDEX ix_endet_ap_pto_unnested ON ap_pto_unnested(endet);
 CREATE INDEX ix_art_ap_pto_unnested ON ap_pto_unnested(art);
 CREATE INDEX ix_schriftinhalt_ap_pto_unnested ON ap_pto_unnested(schriftinhalt);
 
-CREATE OR REPLACE FUNCTION tg_refresh_ap_pto_unnested()
-RETURNS trigger LANGUAGE plpgsql AS $$
-BEGIN
-    REFRESH MATERIALIZED VIEW ap_pto_unnested;
-    RETURN NULL;
-END;
-$$;
+-- CREATE OR REPLACE FUNCTION tg_refresh_ap_pto_unnested()
+-- RETURNS trigger LANGUAGE plpgsql AS $$
+-- BEGIN
+--     REFRESH MATERIALIZED VIEW ap_pto_unnested;
+--     RETURN NULL;
+-- END;
+-- $$;
 
-CREATE TRIGGER tg_refresh_ap_pto_unnested AFTER INSERT OR UPDATE OR DELETE
-ON ap_pto
-FOR EACH STATEMENT EXECUTE PROCEDURE tg_refresh_ap_pto_unnested();
+-- CREATE TRIGGER tg_refresh_ap_pto_unnested AFTER INSERT OR UPDATE OR DELETE
+-- ON ap_pto
+-- FOR EACH STATEMENT EXECUTE PROCEDURE tg_refresh_ap_pto_unnested();
 
 -- ap_darstellung table
 CREATE MATERIALIZED VIEW ap_darstellung_unnested AS
@@ -22513,14 +22513,14 @@ CREATE INDEX ix_endet_ap_darstellung_unnested ON ap_darstellung_unnested(endet);
 CREATE INDEX ix_art_ap_darstellung_unnested ON ap_darstellung_unnested(art);
 
 
-CREATE OR REPLACE FUNCTION tg_refresh_ap_darstellung_unnested()
-RETURNS trigger LANGUAGE plpgsql AS $$
-BEGIN
-    REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
-    RETURN NULL;
-END;
-$$;
+-- CREATE OR REPLACE FUNCTION tg_refresh_ap_darstellung_unnested()
+-- RETURNS trigger LANGUAGE plpgsql AS $$
+-- BEGIN
+--     REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
+--     RETURN NULL;
+-- END;
+-- $$;
 
-CREATE TRIGGER tg_refresh_ap_darstellung_unnested AFTER INSERT OR UPDATE OR DELETE
-ON ap_darstellung
-FOR EACH STATEMENT EXECUTE PROCEDURE tg_refresh_ap_darstellung_unnested();
+-- CREATE TRIGGER tg_refresh_ap_darstellung_unnested AFTER INSERT OR UPDATE OR DELETE
+-- ON ap_darstellung
+-- FOR EACH STATEMENT EXECUTE PROCEDURE tg_refresh_ap_darstellung_unnested();

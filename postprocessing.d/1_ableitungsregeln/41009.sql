@@ -19,31 +19,34 @@ SELECT
 FROM ax_friedhof;
 
 -- Text, Friedhof
+
+REFRESH MATERIALIZED VIEW ap_pto_unnested;
+REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
 INSERT INTO po_labels(gml_id,thema,layer,point,text,signaturnummer,drehwinkel,horizontaleausrichtung,vertikaleausrichtung,skalierung,fontsperrung,modell)
 SELECT
-	gml_id,
-	'Friedhöfe' AS thema,
-	'ax_friedhof' AS layer,
-	point,
-	text,
-	signaturnummer,
-	drehwinkel,horizontaleausrichtung,vertikaleausrichtung,skalierung,fontsperrung,modell
+gml_id,
+'Friedhöfe' AS thema,
+'ax_friedhof' AS layer,
+point,
+text,
+signaturnummer,
+drehwinkel,horizontaleausrichtung,vertikaleausrichtung,skalierung,fontsperrung,modell
 FROM (
-	SELECT
-		o.gml_id,
-		coalesce(t.wkb_geometry,st_centroid(o.wkb_geometry)) AS point,
-		coalesce(t.schriftinhalt,o.name) AS text,
-		coalesce(d.signaturnummer,t.signaturnummer,n.signaturnummer,'4140') AS signaturnummer,
-		t.drehwinkel,t.horizontaleausrichtung,t.vertikaleausrichtung,t.skalierung,t.fontsperrung,
-		coalesce(
-			t.advstandardmodell||t.sonstigesmodell||n.advstandardmodell||n.sonstigesmodell,
-			o.advstandardmodell||o.sonstigesmodell
-		) AS modell
-	FROM ax_friedhof o
-	LEFT OUTER JOIN ap_pto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.art='Friedhof' AND t.endet IS NULL
-	LEFT OUTER JOIN ap_pto n ON ARRAY[o.gml_id] <@ n.dientzurdarstellungvon AND n.art='NAM' AND n.endet IS NULL
-	LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art IN ('NAM','Friedhof') AND d.endet IS NULL
-	WHERE name IS NULL AND n.schriftinhalt IS NULL AND o.endet IS NULL
+SELECT
+o.gml_id,
+coalesce(t.wkb_geometry,st_centroid(o.wkb_geometry)) AS point,
+coalesce(t.schriftinhalt,o.name) AS text,
+coalesce(d.signaturnummer,t.signaturnummer,n.signaturnummer,'4140') AS signaturnummer,
+t.drehwinkel,t.horizontaleausrichtung,t.vertikaleausrichtung,t.skalierung,t.fontsperrung,
+coalesce(
+t.advstandardmodell||t.sonstigesmodell||n.advstandardmodell||n.sonstigesmodell,
+o.advstandardmodell||o.sonstigesmodell
+) AS modell
+FROM ax_friedhof o
+LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id like t.dientzurdarstellungvon_unnested || '%' AND t.art='Friedhof' AND t.endet IS NULL
+LEFT OUTER JOIN ap_pto_unnested n ON o.gml_id like n.dientzurdarstellungvon_unnested || '%' AND n.art='NAM' AND n.endet IS NULL
+LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id like d.dientzurdarstellungvon_unnested || '%' AND d.art IN ('NAM','Friedhof') AND d.endet IS NULL
+WHERE name IS NULL AND n.schriftinhalt IS NULL 
 ) AS n WHERE NOT text IS NULL;
 
 -- Name, Friedhof

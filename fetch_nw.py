@@ -44,9 +44,7 @@ def download_file(url, dst):
 
 c = 0
 for url in url_list:
-    if c < 9:
-        c += 1
-        continue
+
     dst = inventory_dir + url.rsplit('/', 1)[1]
     try:
         download_file(url, dst)
