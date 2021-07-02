@@ -203,9 +203,9 @@ FROM (
 		FROM ax_gebaeude
 		WHERE endet IS NULL
 	) AS o
-	LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id LIKE t.dientzurdarstellungvon_unnested AND t.art='GFK' AND t.endet IS NULL
-	LEFT OUTER JOIN ap_pto_unnested n ON o.gml_id LIKE n.dientzurdarstellungvon_unnested AND n.art='NAM' AND n.endet IS NULL
-	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id LIKE d.dientzurdarstellungvon_unnested AND d.art IN ('GFK','NAM') AND d.endet IS NULL
+	LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.art='GFK' AND t.endet IS NULL
+	LEFT OUTER JOIN ap_pto_unnested n ON o.gml_id = n.dientzurdarstellungvon_unnested AND n.art='NAM' AND n.endet IS NULL
+	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art IN ('GFK','NAM') AND d.endet IS NULL
 ) AS o
 WHERE NOT text IS NULL;
 

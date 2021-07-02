@@ -60,9 +60,9 @@ FROM (
 			o.advstandardmodell||o.sonstigesmodell
 		) AS modell
 	FROM ax_sportfreizeitunderholungsflaeche o
-	LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id like t.dientzurdarstellungvon_unnested  AND t.art='FKT' AND t.endet IS NULL
-	LEFT OUTER JOIN ap_pto_unnested n ON o.gml_id like n.dientzurdarstellungvon_unnested AND n.art='NAM' AND n.endet IS NULL
-	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id like d.dientzurdarstellungvon_unnested AND d.art IN ('NAM','FKT') AND d.endet IS NULL
+	LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested  AND t.art='FKT' AND t.endet IS NULL
+	LEFT OUTER JOIN ap_pto_unnested n ON o.gml_id = n.dientzurdarstellungvon_unnested AND n.art='NAM' AND n.endet IS NULL
+	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art IN ('NAM','FKT') AND d.endet IS NULL
 	WHERE name IS NULL AND n.schriftinhalt IS NULL AND o.endet IS NULL
 ) AS o
 WHERE NOT text IS NULL;

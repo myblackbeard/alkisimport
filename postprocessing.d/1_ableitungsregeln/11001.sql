@@ -5,7 +5,11 @@ SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 -- Flurstücke (11001)
 --
 
+
 SELECT 'Flurstücke werden verarbeitet.';
+
+REFRESH MATERIALIZED VIEW ap_pto_unnested;
+REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
 
 -- Flurstücke
 INSERT INTO po_polygons(gml_id,thema,layer,polygon,signaturnummer,modell)
@@ -46,8 +50,7 @@ WHERE a.ogc_fid<b.ogc_fid
 
 -- Flurstücksnummern
 -- Schrägstrichdarstellung
-REFRESH MATERIALIZED VIEW ap_pto_unnested;
-REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
+
 
 SELECT 'Erzeuge Flurstücksnummern in Schrägstrichdarstellung...';
 INSERT INTO po_labels(gml_id,thema,layer,point,text,signaturnummer,drehwinkel,horizontaleausrichtung,vertikaleausrichtung,skalierung,fontsperrung,modell)
@@ -189,8 +192,8 @@ FROM (
 			coalesce(t.drehwinkel,0) AS drehwinkel,
 			t.horizontaleausrichtung
 		FROM ax_flurstueck o
-		LEFT OUTER JOIN ap_pto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.endet IS NULL
-		LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.endet IS NULL
+		LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.endet IS NULL
+		LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.endet IS NULL
 		WHERE o.endet IS NULL AND coalesce(t.signaturnummer,CASE WHEN :alkis_fnbruch THEN '4115' ELSE '4113' END) IN ('4115','4123') AND coalesce(o.nenner,'0')<>'0'
 	) AS bruchstrich0 WHERE lenz>0 AND lenn>0
 ) AS bruchstrich1;
