@@ -1,6 +1,8 @@
 SET client_encoding TO 'UTF8';
 SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 
+REFRESH MATERIALIZED VIEW ap_pto_unnested;
+REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
 --
 -- Gebäudeteil (31002)
 --
@@ -65,7 +67,7 @@ SELECT
 	coalesce(p.advstandardmodell||p.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 FROM ax_bauteil o
 LEFT OUTER JOIN ap_ppo p ON ARRAY[o.gml_id] <@ p.dientzurdarstellungvon AND p.art='BAT' AND p.endet IS NULL
-LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art='BAT' AND d.endet IS NULL
+LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id LIKE d.dientzurdarstellungvon_unnested AND d.art='BAT' AND d.endet IS NULL
 WHERE bauart=2100 AND o.endet IS NULL;
 
 -- Gebäudeteildachform
@@ -96,8 +98,8 @@ SELECT
 	drehwinkel, horizontaleausrichtung, vertikaleausrichtung, skalierung, fontsperrung,
 	coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 FROM ax_bauteil o
-LEFT OUTER JOIN ap_pto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.art='DAF' AND t.endet IS NULL
-LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art='DAF' AND d.endet IS NULL
+LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.art='DAF' AND t.endet IS NULL
+LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art='DAF' AND d.endet IS NULL
 WHERE NOT dachform IS NULL AND o.endet IS NULL;
 
 -- Gebäudeteil, oberirdische Geschosse
@@ -112,8 +114,8 @@ SELECT
 	drehwinkel, horizontaleausrichtung, vertikaleausrichtung, skalierung, fontsperrung,
 	coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 FROM ax_bauteil o
-LEFT OUTER JOIN ap_pto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.art='AOG' AND t.endet IS NULL
-LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art='AOG' AND d.endet IS NULL
+LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.art='AOG' AND t.endet IS NULL
+LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art='AOG' AND d.endet IS NULL
 WHERE NOT anzahlderoberirdischengeschosse IS NULL AND o.endet IS NULL;
 
 -- Besondere Gebäudelinien

@@ -1,6 +1,8 @@
 SET client_encoding TO 'UTF8';
 SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 
+REFRESH MATERIALIZED VIEW ap_pto_unnested;
+REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
 --
 -- Gebäude (31001)
 --
@@ -143,12 +145,11 @@ FROM (
 	WHERE endet IS NULL
 ) AS o
 LEFT OUTER JOIN ap_ppo p ON ARRAY[o.gml_id] <@ p.dientzurdarstellungvon AND p.art='GFK' AND p.endet IS NULL
-LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art='GFK' AND d.endet IS NULL
+LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id LIKE d.dientzurdarstellungvon_unnested AND d.art='GFK' AND d.endet IS NULL
 WHERE NOT o.signaturnummer IS NULL;
 
 -- Gebäudebeschriftungen
-REFRESH MATERIALIZED VIEW ap_pto_unnested;
-REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
+
 
 INSERT INTO po_labels(gml_id,thema,layer,point,text,signaturnummer,drehwinkel,horizontaleausrichtung,vertikaleausrichtung,skalierung,fontsperrung,modell)
 SELECT
@@ -257,7 +258,7 @@ FROM (
 	) AS o
 ) AS o
 LEFT OUTER JOIN ap_ppo p ON ARRAY[o.gml_id] <@ p.dientzurdarstellungvon AND p.art='GFK' AND p.endet IS NULL
-LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art='GFK' AND d.endet IS NULL
+LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id LIKE d.dientzurdarstellungvon_unnested AND d.art='GFK' AND d.endet IS NULL
 WHERE NOT o.signaturnummer IS NULL;
 
 -- Weitere Gebäudefunktionsbeschriftungen
@@ -298,9 +299,9 @@ FROM (
 		FROM ax_gebaeude o
 		WHERE endet IS NULL
 	) AS o
-	LEFT OUTER JOIN ap_pto_unnested t ON ap_pto_unnested t ON o.gml_id LIKE t.dientzurdarstellungvon_unnested AND t.art='GFK' AND t.endet IS NULL
-	LEFT OUTER JOIN ap_pto_unnested n ON o.gml_id LIKE n.dientzurdarstellungvon_unnested AND n.art='NAM' AND n.endet IS NULL
-	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id LIKE d.dientzurdarstellungvon_unnested AND d.art IN ('NAM','GFK') AND d.endet IS NULL
+	LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.art='GFK' AND t.endet IS NULL
+	LEFT OUTER JOIN ap_pto_unnested n ON o.gml_id = n.dientzurdarstellungvon_unnested AND n.art='NAM' AND n.endet IS NULL
+	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art IN ('NAM','GFK') AND d.endet IS NULL
 	WHERE NOT gebaeudefunktion IS NULL
 ) AS o
 WHERE NOT text IS NULL;
@@ -339,8 +340,8 @@ SELECT
 	drehwinkel, horizontaleausrichtung, vertikaleausrichtung, skalierung, fontsperrung,
 	coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 FROM ax_gebaeude o
-LEFT OUTER JOIN ap_pto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.art='AOG_AUG' AND t.endet IS NULL
-LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art='AOG_AUG' AND d.endet IS NULL
+LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.art='AOG_AUG' AND t.endet IS NULL
+LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art='AOG_AUG' AND d.endet IS NULL
 WHERE (NOT anzahlderoberirdischengeschosse IS NULL OR NOT anzahlderunterirdischengeschosse IS NULL) AND o.endet IS NULL;
 
 -- Dachform
@@ -371,8 +372,8 @@ SELECT
 	drehwinkel, horizontaleausrichtung, vertikaleausrichtung, skalierung, fontsperrung,
 	coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 FROM ax_gebaeude o
-LEFT OUTER JOIN ap_pto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.art='DAF' AND t.endet IS NULL
-LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art='DAF' AND d.endet IS NULL
+LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.art='DAF' AND t.endet IS NULL
+LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art='DAF' AND d.endet IS NULL
 WHERE NOT dachform IS NULL AND o.endet IS NULL;
 
 -- Gebäudezustände
@@ -394,6 +395,6 @@ SELECT
 	drehwinkel, horizontaleausrichtung, vertikaleausrichtung, skalierung, fontsperrung,
 	coalesce(o.advstandardmodell||o.sonstigesmodell,t.advstandardmodell||t.sonstigesmodell) AS modell
 FROM ax_gebaeude o
-LEFT OUTER JOIN ap_pto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.art='ZUS' AND t.endet IS NULL
-LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art='ZUS' AND d.endet IS NULL
+LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.art='ZUS' AND t.endet IS NULL
+LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art='ZUS' AND d.endet IS NULL
 WHERE zustand IN (2200,2300,3000,4000) AND o.endet IS NULL;

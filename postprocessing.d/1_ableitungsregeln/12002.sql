@@ -100,8 +100,8 @@ FROM (
 		coalesce(tx.advstandardmodell||tx.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 	FROM ax_lagebezeichnungmithausnummer o
 	LEFT OUTER JOIN po_zeigtauf_hausnummer gt ON o.gml_id=gt.zeigtauf
-	LEFT OUTER JOIN ap_pto_unnested tx ON o.gml_id LIKE tx.dientzurdarstellungvon_unnested AND tx.endet IS NULL AND tx.art='HNR'
-	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id LIKE d.dientzurdarstellungvon_unnested AND d.endet IS NULL AND d.art='HNR'
+	LEFT OUTER JOIN ap_pto_unnested tx ON o.gml_id = tx.dientzurdarstellungvon_unnested AND tx.endet IS NULL AND tx.art='HNR'
+	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.endet IS NULL AND d.art='HNR'
 	WHERE o.endet IS NULL AND (gt.zeigtauf IS NOT NULL OR o.gml_id LIKE 'DEBY%')
 ) AS foo
 WHERE text IS NOT NULL;

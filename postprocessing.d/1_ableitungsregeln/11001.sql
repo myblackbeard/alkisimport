@@ -61,8 +61,8 @@ SELECT
 	t.drehwinkel, t.horizontaleausrichtung, t.vertikaleausrichtung, t.skalierung, t.fontsperrung,
 	coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 FROM ax_flurstueck o
-LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id LIKE t.dientzurdarstellungvon_unnested AND t.art='ZAE_NEN' AND t.endet IS NULL
-LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id LIKE d.dientzurdarstellungvon_unnested AND d.art='ZAE_NEN' AND d.endet IS NULL
+LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.art='ZAE_NEN' AND t.endet IS NULL
+LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art='ZAE_NEN' AND d.endet IS NULL
 WHERE o.endet IS NULL AND (coalesce(t.signaturnummer,CASE WHEN :alkis_fnbruch THEN '4115' ELSE '4113' END) IN ('4113','4122') OR coalesce(o.nenner,'0')='0');
 
 -- Zähler
@@ -104,8 +104,8 @@ FROM (
 			t.drehwinkel, t.horizontaleausrichtung, 'Basis'::text AS vertikaleausrichtung, t.skalierung, t.fontsperrung,
 			coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 		FROM ax_flurstueck o
-		LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id LIKE t.dientzurdarstellungvon_unnested AND t.endet IS NULL
-		LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id LIKE d.dientzurdarstellungvon_unnested AND d.endet IS NULL
+		LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.endet IS NULL
+		LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.endet IS NULL
 		WHERE o.endet IS NULL AND (coalesce(t.signaturnummer,CASE WHEN :alkis_fnbruch THEN '4115' ELSE '4113' END) IN ('4115','4123') AND coalesce(o.nenner,'0')<>'0')
 	) AS foo
 ) AS foo;
@@ -148,8 +148,8 @@ FROM (
 			t.drehwinkel, t.horizontaleausrichtung, 'oben'::text AS vertikaleausrichtung, t.skalierung, t.fontsperrung,
 			coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 		FROM ax_flurstueck o
-		LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id LIKE t.dientzurdarstellungvon_unnested  AND t.endet IS NULL
-		LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id LIKE d.dientzurdarstellungvon_unnested AND d.endet IS NULL
+		LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested  AND t.endet IS NULL
+		LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.endet IS NULL
 		WHERE o.endet IS NULL AND (coalesce(t.signaturnummer,CASE WHEN :alkis_fnbruch THEN '4115' ELSE '4113' END) IN ('4115','4123') AND coalesce(o.nenner,'0')<>'0')
 	) AS foo
 	WHERE NOT text IS NULL
