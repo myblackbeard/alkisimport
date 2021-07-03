@@ -22489,6 +22489,7 @@ CREATE INDEX ix_ogc_fid_ap_pto_unnested ON ap_pto_unnested(ogc_fid);
 CREATE INDEX ix_endet_ap_pto_unnested ON ap_pto_unnested(endet);
 CREATE INDEX ix_art_ap_pto_unnested ON ap_pto_unnested(art);
 CREATE INDEX ix_schriftinhalt_ap_pto_unnested ON ap_pto_unnested(schriftinhalt);
+CREATE INDEX ix_dientzurdarstellungvon_ap_pto_unnested on ap_pto_unnested(dientzurdarstellungvon_unnested);
 
 -- CREATE OR REPLACE FUNCTION tg_refresh_ap_pto_unnested()
 -- RETURNS trigger LANGUAGE plpgsql AS $$
@@ -22511,7 +22512,52 @@ CREATE INDEX ix_ogc_fid_ap_darstellung_unnested ON ap_darstellung_unnested(ogc_f
 CREATE INDEX ix_gml_id_ap_darstellung_unnested ON ap_darstellung_unnested(gml_id);
 CREATE INDEX ix_endet_ap_darstellung_unnested ON ap_darstellung_unnested(endet);
 CREATE INDEX ix_art_ap_darstellung_unnested ON ap_darstellung_unnested(art);
+CREATE INDEX ix_dientzurdarstellungvon_ap_darstellung_unnested on ap_darstellung_unnested(dientzurdarstellungvon_unnested);
 
+
+
+CREATE MATERIALIZED VIEW ax_gebaeude_unnested AS 
+     SELECT a.*, u.zeigtAuf::text AS zeigtAuf_unnested
+     FROM ax_gebaeude a 
+     JOIN (SELECT ogc_fid, unnest(zeigtAuf) as zeigtAuf FROM ax_gebaeude) u on a.ogc_fid = u.ogc_fid;
+
+CREATE INDEX ix_zeigtAuf_ax_gebaeude_unnested ON ax_gebaeude_unnested(zeigtAuf_unnested);
+
+
+CREATE MATERIALIZED VIEW ax_turm_unnested AS 
+     SELECT a.*, u.zeigtAuf::text AS zeigtAuf_unnested
+     FROM ax_turm a 
+     JOIN (SELECT ogc_fid, unnest(zeigtAuf) as zeigtAuf FROM ax_turm) u on a.ogc_fid = u.ogc_fid;
+
+CREATE INDEX ix_zeigtAuf_ax_turm_unnested ON ax_turm_unnested(zeigtAuf_unnested);
+
+
+CREATE MATERIALIZED VIEW ax_flurstueck_unnested AS 
+     SELECT a.*, u.zeigtAuf::text AS zeigtAuf_unnested, u.weistauf::text AS weistauf_unnested
+     FROM ax_flurstueck a 
+     JOIN (SELECT ogc_fid, unnest(zeigtAuf) as zeigtAuf, unnest(weistauf) as weistauf FROM ax_flurstueck) u on a.ogc_fid = u.ogc_fid;
+
+CREATE INDEX ix_zeigtAuf_ax_flurstueck_unnested ON ax_flurstueck_unnested(zeigtAuf_unnested);
+CREATE INDEX ix_weistauf_ax_flurstueck_unnested ON ax_flurstueck_unnested(weistauf_unnested);
+
+
+CREATE MATERIALIZED VIEW ap_ppo_unnested AS 
+     SELECT a.*, u.dientzurdarstellungvon::text AS dientzurdarstellungvon_unnested 
+     FROM ap_ppo a 
+     JOIN (SELECT ogc_fid, unnest(dientzurdarstellungvon) AS dientzurdarstellungvon FROM ap_ppo) u on a.ogc_fid = u.ogc_fid;
+
+CREATE INDEX ix_ogc_fid_ap_ppo_unnested ON ap_ppo_unnested(ogc_fid);
+CREATE INDEX ix_endet_ap_ppo_unnested ON ap_ppo_unnested(endet);
+CREATE INDEX ix_art_ap_ppo_unnested ON ap_ppo_unnested(art);
+
+CREATE MATERIALIZED VIEW ap_lpo_unnested AS 
+     SELECT a.*, u.dientzurdarstellungvon::text AS dientzurdarstellungvon_unnested 
+     FROM ap_lpo a 
+     JOIN (SELECT ogc_fid, unnest(dientzurdarstellungvon) AS dientzurdarstellungvon FROM ap_lpo) u on a.ogc_fid = u.ogc_fid;
+
+CREATE INDEX ix_ogc_fid_ap_lpo_unnested ON ap_lpo_unnested(ogc_fid);
+CREATE INDEX ix_endet_ap_lpo_unnested ON ap_lpo_unnested(endet);
+CREATE INDEX ix_art_ap_lpo_unnested ON ap_lpo_unnested(art);
 
 -- CREATE OR REPLACE FUNCTION tg_refresh_ap_darstellung_unnested()
 -- RETURNS trigger LANGUAGE plpgsql AS $$

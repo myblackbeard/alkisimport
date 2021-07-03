@@ -10,6 +10,16 @@ SELECT 'Lagebezeichnungen mit Hausnummer werden verarbeitet.';
 
 REFRESH MATERIALIZED VIEW ap_pto_unnested;
 REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
+REFRESH MATERIALIZED VIEW ax_gebaeude_unnested;
+REFRESH MATERIALIZED VIEW ax_turm_unnested;
+REFRESH MATERIALIZED VIEW ax_flurstueck_unnested;
+
+
+REFRESH MATERIALIZED VIEW ap_pto_unnested;
+REFRESH MATERIALIZED VIEW ap_ppo_unnested;
+REFRESH MATERIALIZED VIEW ap_lpo_unnested;
+REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
+
 -- mit Hausnummer, Ortsteil
 SELECT ' Ortsteil verarbeitet.';
 INSERT INTO po_labels(gml_id,thema,layer,point,text,signaturnummer,drehwinkel,horizontaleausrichtung,vertikaleausrichtung,skalierung,fontsperrung,modell)
@@ -23,7 +33,7 @@ SELECT
 	drehwinkel, horizontaleausrichtung, vertikaleausrichtung, skalierung, fontsperrung,
 	coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 FROM ax_lagebezeichnungmithausnummer o
-JOIN ap_pto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.endet IS NULL AND t.art='Ort'
+JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.endet IS NULL AND t.art='Ort'
 WHERE coalesce(schriftinhalt,'')<>'' AND o.endet IS NULL;
 
 ANALYZE ax_lagebezeichnungmithausnummer;
@@ -45,8 +55,8 @@ INSERT INTO po_zeigtauf_hausnummer
 	FROM (
 		SELECT
 			unnest(zeigtauf) AS zeigtauf, wkb_geometry, '' AS prefix
-		FROM ax_turm z
-		JOIN ax_lagebezeichnungmithausnummer lmh ON ARRAY[lmh.gml_id] <@ z.zeigtAuf AND lmh.endet IS NULL
+		FROM ax_turm_unnested z
+		JOIN ax_lagebezeichnungmithausnummer lmh ON lmh.gml_id = z.zeigtAuf_unnested AND lmh.endet IS NULL
 		WHERE z.endet IS NULL
 	) AS z;
 
@@ -58,8 +68,8 @@ INSERT INTO po_zeigtauf_hausnummer
 	FROM (
 		SELECT
 			unnest(zeigtauf) AS zeigtauf, wkb_geometry, '' AS prefix
-		FROM ax_gebaeude z
-		JOIN ax_lagebezeichnungmithausnummer lmh ON ARRAY[lmh.gml_id] <@ z.zeigtAuf AND lmh.endet IS NULL
+		FROM ax_gebaeude_unnested z
+		JOIN ax_lagebezeichnungmithausnummer lmh ON lmh.gml_id = z.zeigtAuf_unnested AND lmh.endet IS NULL
 		WHERE z.endet IS NULL
 	) AS z
 	WHERE NOT EXISTS (SELECT h.zeigtauf FROM po_zeigtauf_hausnummer h WHERE h.zeigtauf=z.zeigtauf);
@@ -72,8 +82,8 @@ INSERT INTO po_zeigtauf_hausnummer
 	FROM (
 		SELECT
 			unnest(zeigtauf) AS zeigtauf, wkb_geometry, 'HsNr. ' AS prefix
-		FROM ax_flurstueck z
-		JOIN ax_lagebezeichnungmithausnummer lmh ON ARRAY[lmh.gml_id] <@ z.zeigtAuf AND lmh.endet IS NULL
+		FROM ax_flurstueck_unnested z
+		JOIN ax_lagebezeichnungmithausnummer lmh ON lmh.gml_id = z.zeigtAuf_unnested AND lmh.endet IS NULL
 		WHERE z.endet IS NULL
 	) AS z
 	WHERE NOT EXISTS (SELECT h.zeigtauf FROM po_zeigtauf_hausnummer h WHERE h.zeigtauf=z.zeigtauf);

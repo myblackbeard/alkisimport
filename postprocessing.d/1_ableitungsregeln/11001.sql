@@ -9,6 +9,9 @@ SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 SELECT 'Flurstücke werden verarbeitet.';
 
 REFRESH MATERIALIZED VIEW ap_pto_unnested;
+REFRESH MATERIALIZED VIEW ap_ppo_unnested;
+REFRESH MATERIALIZED VIEW ap_lpo_unnested;
+
 REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
 
 -- Flurstücke
@@ -209,7 +212,7 @@ SELECT
 	CASE WHEN o.abweichenderrechtszustand='true' THEN 2005 ELSE 2004 END AS signaturnummer,
 	coalesce(l.advstandardmodell||l.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 FROM ax_flurstueck o
-JOIN ap_lpo l ON ARRAY[o.gml_id] <@ l.dientzurdarstellungvon AND l.endet IS NULL
+JOIN ap_lpo_unnested l ON o.gml_id = l.dientzurdarstellungvon_unnested AND l.endet IS NULL
   -- AND l.art='Pfeil' -- art in RP nicht immer gesetzt
 WHERE o.endet IS NULL;
 
@@ -225,5 +228,5 @@ SELECT
 	CASE WHEN o.abweichenderrechtszustand='true' THEN 3011 ELSE 3010 END AS signaturnummer,
 	coalesce(p.advstandardmodell||p.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 FROM ax_flurstueck o
-JOIN ap_ppo p ON ARRAY[o.gml_id] <@ p.dientzurdarstellungvon AND p.art='Haken' AND p.endet IS NULL
+JOIN ap_ppo_unnested p ON o.gml_id = p.dientzurdarstellungvon_unnested AND p.art='Haken' AND p.endet IS NULL
 WHERE o.endet IS NULL;
