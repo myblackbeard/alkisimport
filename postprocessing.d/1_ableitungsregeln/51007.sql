@@ -7,6 +7,11 @@ SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 
 SELECT 'Historische Bauwerke oder Einrichtungen werden verarbeitet.';
 
+REFRESH MATERIALIZED VIEW ap_pto_unnested;
+REFRESH MATERIALIZED VIEW ap_ppo_unnested;
+REFRESH MATERIALIZED VIEW ap_lpo_unnested;
+REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
+
 -- Historisches Bauwerk oder historische Einrichtung, Flächen
 INSERT INTO po_polygons(gml_id,thema,layer,polygon,signaturnummer,modell)
 SELECT
@@ -126,9 +131,9 @@ FROM (
 			o.advstandardmodell||o.sonstigesmodell
 		) AS modell
 	FROM ax_historischesbauwerkoderhistorischeeinrichtung o
-	LEFT OUTER JOIN ap_pto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.art='ATP' AND t.endet IS NULL
-	LEFT OUTER JOIN ap_pto n ON ARRAY[o.gml_id] <@ n.dientzurdarstellungvon AND n.art='NAM' AND n.endet IS NULL
-	LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art IN ('ATP','NAM') AND d.endet IS NULL
+	LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.art='ATP' AND t.endet IS NULL
+	LEFT OUTER JOIN ap_pto_unnested n ON o.gml_id = n.dientzurdarstellungvon_unnested AND n.art='NAM' AND n.endet IS NULL
+	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art IN ('ATP','NAM') AND d.endet IS NULL
 	WHERE o.endet IS NULL
 ) AS o
 WHERE NOT text IS NULL;
@@ -152,7 +157,7 @@ FROM (
 		drehwinkel,horizontaleausrichtung,vertikaleausrichtung,skalierung,fontsperrung,
 		coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 	FROM ax_historischesbauwerkoderhistorischeeinrichtung o
-	LEFT OUTER JOIN ap_pto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.art='NAM' AND t.endet IS NULL
-	LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art='NAM' AND d.endet IS NULL
+	LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.art='NAM' AND t.endet IS NULL
+	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art='NAM' AND d.endet IS NULL
 	WHERE o.endet IS NULL AND NOT name IS NULL
 ) AS n;

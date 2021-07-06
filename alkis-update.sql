@@ -17168,3 +17168,5 @@ END;
 $$ LANGUAGE plpgsql;
 
 SELECT pg_temp.alkis_update_schema();
+
+

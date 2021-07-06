@@ -7,6 +7,11 @@ SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 
 SELECT 'Plätze werden verarbeitet.';
 
+REFRESH MATERIALIZED VIEW ap_pto_unnested;
+REFRESH MATERIALIZED VIEW ap_ppo_unnested;
+REFRESH MATERIALIZED VIEW ap_lpo_unnested;
+REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
+
 -- Flächen
 INSERT INTO po_polygons(gml_id,thema,layer,polygon,signaturnummer,modell)
 SELECT
@@ -47,8 +52,8 @@ FROM (
 		) AS signaturnummer,
 		coalesce(p.advstandardmodell||p.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 	FROM ax_platz o
-	LEFT OUTER JOIN ap_ppo p ON ARRAY[o.gml_id] <@ p.dientzurdarstellungvon AND p.art='FKT' AND p.endet IS NULL
-	LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art='FKT' AND d.endet IS NULL
+	LEFT OUTER JOIN ap_ppo_unnested p ON o.gml_id = p.dientzurdarstellungvon_unnested AND p.art='FKT' AND p.endet IS NULL
+	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art='FKT' AND d.endet IS NULL
 	WHERE o.endet IS NULL
 ) AS o
 WHERE NOT signaturnummer IS NULL;
@@ -76,8 +81,8 @@ FROM (
 		drehwinkel,horizontaleausrichtung,vertikaleausrichtung,skalierung,fontsperrung,
 		coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 	FROM ax_platz o
-	LEFT OUTER JOIN ap_pto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.endet IS NULL AND (t.art='FKT' OR o.gml_id LIKE 'DERP')
-	LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.endet IS NULL AND (d.art='FKT' OR o.gml_id LIKE 'DERP')
+	LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.endet IS NULL AND (t.art='FKT' OR o.gml_id LIKE 'DERP')
+	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.endet IS NULL AND (d.art='FKT' OR o.gml_id LIKE 'DERP')
 	WHERE o.endet IS NULL AND (funktion IN (5340,5350) OR o.gml_id LIKE 'DERP%')
 ) AS n WHERE NOT text IS NULL;
 
@@ -100,7 +105,7 @@ FROM (
 		drehwinkel,horizontaleausrichtung,vertikaleausrichtung,skalierung,fontsperrung,
 		coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 	FROM ax_platz o
-	LEFT OUTER JOIN ap_pto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.art='ZNM' AND t.endet IS NULL
-	LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art='ZNM' AND d.endet IS NULL
+	LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.art='ZNM' AND t.endet IS NULL
+	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art='ZNM' AND d.endet IS NULL
 	WHERE o.endet IS NULL
 ) AS n WHERE NOT text IS NULL;

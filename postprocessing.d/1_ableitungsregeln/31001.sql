@@ -3,11 +3,17 @@ SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 
 REFRESH MATERIALIZED VIEW ap_pto_unnested;
 REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
+REFRESH MATERIALIZED VIEW ap_ppo_unnested;
 --
 -- Gebäude (31001)
 --
 
 SELECT 'Gebäude werden verarbeitet.';
+
+REFRESH MATERIALIZED VIEW ap_pto_unnested;
+REFRESH MATERIALIZED VIEW ap_ppo_unnested;
+REFRESH MATERIALIZED VIEW ap_lpo_unnested;
+REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
 
 -- Gebäudeflächen (Signaturnummer = 2XXX oder 2XXX1XXX)
 INSERT INTO po_polygons(gml_id,thema,layer,polygon,signaturnummer,modell)
@@ -144,7 +150,7 @@ FROM (
 	FROM ax_gebaeude
 	WHERE endet IS NULL
 ) AS o
-LEFT OUTER JOIN ap_ppo p ON ARRAY[o.gml_id] <@ p.dientzurdarstellungvon AND p.art='GFK' AND p.endet IS NULL
+LEFT OUTER JOIN ap_ppo_unnested p ON o.gml_id = p.dientzurdarstellungvon_unnested AND p.art='GFK' AND p.endet IS NULL
 LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id LIKE d.dientzurdarstellungvon_unnested AND d.art='GFK' AND d.endet IS NULL
 WHERE NOT o.signaturnummer IS NULL;
 
@@ -257,7 +263,7 @@ FROM (
 		WHERE NOT weiteregebaeudefunktion IS NULL AND endet IS NULL
 	) AS o
 ) AS o
-LEFT OUTER JOIN ap_ppo p ON ARRAY[o.gml_id] <@ p.dientzurdarstellungvon AND p.art='GFK' AND p.endet IS NULL
+LEFT OUTER JOIN ap_ppo_unnested p ON o.gml_id = p.dientzurdarstellungvon_unnested AND p.art='GFK' AND p.endet IS NULL
 LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id LIKE d.dientzurdarstellungvon_unnested AND d.art='GFK' AND d.endet IS NULL
 WHERE NOT o.signaturnummer IS NULL;
 

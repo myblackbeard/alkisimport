@@ -22539,6 +22539,7 @@ CREATE MATERIALIZED VIEW ax_flurstueck_unnested AS
 
 CREATE INDEX ix_zeigtAuf_ax_flurstueck_unnested ON ax_flurstueck_unnested(zeigtAuf_unnested);
 CREATE INDEX ix_weistauf_ax_flurstueck_unnested ON ax_flurstueck_unnested(weistauf_unnested);
+CREATE INDEX ix_gml_id_ax_flurstueck_unnested ON ax_flurstueck_unnested USING btree (gml_id bpchar_pattern_ops);
 
 
 CREATE MATERIALIZED VIEW ap_ppo_unnested AS 

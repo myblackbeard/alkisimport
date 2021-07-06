@@ -7,6 +7,7 @@ SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 
 SELECT 'Sonstige Bauwerke oder Einrichtungen werden verarbeitet (HBDKOM).';
 
+
 -- Flächen
 INSERT INTO po_polygons(gml_id,thema,layer,polygon,signaturnummer,modell)
 SELECT

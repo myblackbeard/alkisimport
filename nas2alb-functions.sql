@@ -91,3 +91,52 @@ BEGIN
 	END IF;
 END;
 $$ LANGUAGE plpgsql IMMUTABLE;
+
+
+
+
+
+-- Duplicate functions for unnested flurstueck tables
+
+CREATE OR REPLACE FUNCTION alkis_flsnrk_unnested(f ax_flurstueck_unnested) RETURNS varchar AS $$
+BEGIN
+	RETURN
+		CASE
+		WHEN f.gml_id LIKE 'DESL%' OR f.gml_id LIKE 'DETH%' THEN
+			to_char(alkis_toint(f.zaehler),'fm0000') || '/' || to_char(coalesce(alkis_toint(f.nenner),0),'fm0000')
+		WHEN f.gml_id LIKE 'DESN%' THEN
+			to_char(alkis_toint(f.zaehler),'fm00000') || '/' || substring(f.flurstueckskennzeichen,15,4)
+		ELSE
+			to_char(alkis_toint(f.zaehler),'fm00000') || '/' || to_char(coalesce(mod(alkis_toint(f.nenner),1000)::int,0),'fm000')
+		END;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE STRICT SET search_path = :"alkis_schema", :"postgis_schema", public;
+
+CREATE OR REPLACE FUNCTION alkis_flsnr_unnested(f ax_flurstueck_unnested) RETURNS varchar AS $$
+BEGIN
+	RETURN
+		to_char(alkis_toint(f.land),'fm00') || to_char(alkis_toint(f.gemarkungsnummer),'fm0000') ||
+		'-' || to_char(coalesce(f.flurnummer,0),'fm000') ||
+		'-' || alkis_flsnrk_unnested(f);
+END;
+$$ LANGUAGE plpgsql IMMUTABLE STRICT SET search_path = :"alkis_schema", :"postgis_schema", public;
+
+CREATE OR REPLACE FUNCTION alkis_flskoord_unnested(f ax_flurstueck_unnested) RETURNS varchar AS $$
+DECLARE
+        g GEOMETRY;
+BEGIN
+	BEGIN
+		SELECT st_pointonsurface(f.wkb_geometry) INTO g;
+	EXCEPTION WHEN OTHERS THEN
+		RAISE NOTICE 'st_pointonsurface-Ausnahme bei %', alkis_flsnrk_unnested(f);
+		BEGIN
+			SELECT st_centroid(f.wkb_geometry) INTO g;
+		EXCEPTION WHEN OTHERS THEN
+			RAISE NOTICE 'st_centroid-Ausnahme bei %', alkis_flsnrk_unnested(f);
+			RETURN NULL;
+		END;
+	END;
+
+	RETURN to_char(st_x(g)*10::int,'fm00000000') ||' '|| to_char(st_y(g)*10::int,'fm00000000');
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;

@@ -6,6 +6,9 @@ SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 
 SELECT 'Erzeuge Straßenzuordnungen...';
 
+REFRESH MATERIALIZED VIEW ax_flurstueck_unnested;
+
+
 DELETE FROM str_shl;
 INSERT INTO str_shl(strshl,strname,gemshl)
 	SELECT DISTINCT

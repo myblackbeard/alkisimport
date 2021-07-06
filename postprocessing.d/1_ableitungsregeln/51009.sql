@@ -8,6 +8,8 @@ SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 SELECT 'Sonstige Bauwerke oder Einrichtungen werden verarbeitet.';
 
 REFRESH MATERIALIZED VIEW ap_pto_unnested;
+REFRESH MATERIALIZED VIEW ap_ppo_unnested;
+REFRESH MATERIALIZED VIEW ap_lpo_unnested;
 REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
 
 -- Flächen
@@ -216,8 +218,8 @@ FROM (
 		) AS signaturnummer,
 		coalesce(p.advstandardmodell||p.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 	FROM ax_sonstigesbauwerkodersonstigeeinrichtung o
-	LEFT OUTER JOIN ap_ppo p ON ARRAY[o.gml_id] <@ p.dientzurdarstellungvon AND p.art='BWF' AND p.endet IS NULL
-	LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art='BWF' AND d.endet IS NULL
+	LEFT OUTER JOIN ap_ppo_unnested p ON o.gml_id = p.dientzurdarstellungvon_unnested AND p.art='BWF' AND p.endet IS NULL
+	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art='BWF' AND d.endet IS NULL
 	WHERE o.endet IS NULL
 ) AS o
 WHERE NOT signaturnummer IS NULL;

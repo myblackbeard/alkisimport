@@ -11,7 +11,6 @@ SELECT 'Flurstücke werden verarbeitet.';
 REFRESH MATERIALIZED VIEW ap_pto_unnested;
 REFRESH MATERIALIZED VIEW ap_ppo_unnested;
 REFRESH MATERIALIZED VIEW ap_lpo_unnested;
-
 REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
 
 -- Flurstücke

@@ -9,6 +9,11 @@ REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
 
 SELECT 'Gebäudeteile werden verarbeitet.';
 
+REFRESH MATERIALIZED VIEW ap_pto_unnested;
+REFRESH MATERIALIZED VIEW ap_ppo_unnested;
+REFRESH MATERIALIZED VIEW ap_lpo_unnested;
+REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
+
 -- Gebäudeteile (Bauteil)
 INSERT INTO po_polygons(gml_id,thema,layer,polygon,signaturnummer,modell)
 SELECT
@@ -66,7 +71,7 @@ SELECT
 	coalesce(d.signaturnummer,p.signaturnummer,'3336') AS signaturnummer,
 	coalesce(p.advstandardmodell||p.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 FROM ax_bauteil o
-LEFT OUTER JOIN ap_ppo p ON ARRAY[o.gml_id] <@ p.dientzurdarstellungvon AND p.art='BAT' AND p.endet IS NULL
+LEFT OUTER JOIN ap_ppo_unnested p ON o.gml_id = p.dientzurdarstellungvon_unnested AND p.art='BAT' AND p.endet IS NULL
 LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id LIKE d.dientzurdarstellungvon_unnested AND d.art='BAT' AND d.endet IS NULL
 WHERE bauart=2100 AND o.endet IS NULL;
 

@@ -7,6 +7,11 @@ SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 
 SELECT 'Bauwerke im Gewässerbereich werden verarbeitet.';
 
+REFRESH MATERIALIZED VIEW ap_pto_unnested;
+REFRESH MATERIALIZED VIEW ap_ppo_unnested;
+REFRESH MATERIALIZED VIEW ap_lpo_unnested;
+REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
+
 -- Linien
 INSERT INTO po_polygons(gml_id,thema,layer,polygon,signaturnummer,modell)
 SELECT
@@ -133,7 +138,7 @@ FROM (
 		) AS signaturnummer,
 		coalesce(p.advstandardmodell||p.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 	FROM ax_bauwerkimgewaesserbereich o
-	JOIN ap_ppo p ON ARRAY[o.gml_id] <@ p.dientzurdarstellungvon AND p.art='BWF' AND p.endet IS NULL
+	JOIN ap_ppo_unnested p ON o.gml_id = p.dientzurdarstellungvon_unnested AND p.art='BWF' AND p.endet IS NULL
 	WHERE o.endet IS NULL AND geometrytype(o.wkb_geometry) IN ('POLYGON','MULTIPOLYGON')
 ) AS o
 WHERE signaturnummer IS NOT NULL;
