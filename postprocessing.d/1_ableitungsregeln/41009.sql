@@ -20,8 +20,6 @@ FROM ax_friedhof;
 
 -- Text, Friedhof
 
-REFRESH MATERIALIZED VIEW ap_pto_unnested;
-REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
 INSERT INTO po_labels(gml_id,thema,layer,point,text,signaturnummer,drehwinkel,horizontaleausrichtung,vertikaleausrichtung,skalierung,fontsperrung,modell)
 SELECT
 gml_id,
@@ -68,7 +66,7 @@ FROM (
 		drehwinkel,horizontaleausrichtung,vertikaleausrichtung,skalierung,fontsperrung,
 		coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 	FROM ax_friedhof o
-	LEFT OUTER JOIN ap_pto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.art='NAM' AND t.endet IS NULL
-	LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art='NAM' AND d.endet IS NULL
+	LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.art='NAM' AND t.endet IS NULL
+	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art='NAM' AND d.endet IS NULL
 	WHERE NOT name IS NULL OR NOT t.schriftinhalt IS NULL AND o.endet IS NULL
 ) AS n;

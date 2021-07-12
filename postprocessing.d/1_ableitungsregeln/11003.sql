@@ -7,10 +7,7 @@ SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 
 SELECT 'Grenzpunkte werden verarbeitet.';
 
-REFRESH MATERIALIZED VIEW ap_pto_unnested;
-REFRESH MATERIALIZED VIEW ap_ppo_unnested;
-REFRESH MATERIALIZED VIEW ap_lpo_unnested;
-REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
+
 
 CREATE TEMPORARY TABLE po_punktortta_istteilvon(gml_id character(16), istteilvon character(16));
 INSERT INTO po_punktortta_istteilvon(gml_id, istteilvon)

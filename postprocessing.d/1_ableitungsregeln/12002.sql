@@ -8,17 +8,11 @@ SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 SELECT 'Lagebezeichnungen mit Hausnummer werden verarbeitet.';
 
 
-REFRESH MATERIALIZED VIEW ap_pto_unnested;
-REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
+
 REFRESH MATERIALIZED VIEW ax_gebaeude_unnested;
 REFRESH MATERIALIZED VIEW ax_turm_unnested;
 REFRESH MATERIALIZED VIEW ax_flurstueck_unnested;
 
-
-REFRESH MATERIALIZED VIEW ap_pto_unnested;
-REFRESH MATERIALIZED VIEW ap_ppo_unnested;
-REFRESH MATERIALIZED VIEW ap_lpo_unnested;
-REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
 
 -- mit Hausnummer, Ortsteil
 SELECT ' Ortsteil verarbeitet.';

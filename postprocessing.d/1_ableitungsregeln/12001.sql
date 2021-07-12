@@ -8,10 +8,6 @@ SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 SELECT 'Lagebezeichnungen ohne Hausnummer werden verarbeitet.';
 
 
-REFRESH MATERIALIZED VIEW ap_pto_unnested;
-REFRESH MATERIALIZED VIEW ap_ppo_unnested;
-REFRESH MATERIALIZED VIEW ap_lpo_unnested;
-REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
 
 -- Flurnummer
 INSERT INTO po_labels(gml_id,thema,layer,point,text,signaturnummer,drehwinkel,horizontaleausrichtung,vertikaleausrichtung,skalierung,fontsperrung,modell)

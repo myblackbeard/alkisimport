@@ -7,10 +7,7 @@ SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 
 SELECT 'Sport-, Freizeit- und Erholungsflächen werden verarbeitet.';
 
-REFRESH MATERIALIZED VIEW ap_pto_unnested;
-REFRESH MATERIALIZED VIEW ap_ppo_unnested;
-REFRESH MATERIALIZED VIEW ap_lpo_unnested;
-REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
+
 
 -- Sport-, Freizeit- und Erholungsfläche
 INSERT INTO po_polygons(gml_id,thema,layer,polygon,signaturnummer,modell)
@@ -26,8 +23,7 @@ WHERE endet IS NULL;
 
 
 -- Anschrieb, Sport-, Freizeit- und Erholungsfläche
-REFRESH MATERIALIZED VIEW ap_pto_unnested;
-REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
+
 
 INSERT INTO po_labels(gml_id,thema,layer,point,text,signaturnummer,drehwinkel,horizontaleausrichtung,vertikaleausrichtung,skalierung,fontsperrung,modell)
 SELECT

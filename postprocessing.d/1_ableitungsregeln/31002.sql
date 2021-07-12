@@ -1,18 +1,14 @@
 SET client_encoding TO 'UTF8';
 SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 
-REFRESH MATERIALIZED VIEW ap_pto_unnested;
-REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
+
 --
 -- Gebäudeteil (31002)
 --
 
 SELECT 'Gebäudeteile werden verarbeitet.';
 
-REFRESH MATERIALIZED VIEW ap_pto_unnested;
-REFRESH MATERIALIZED VIEW ap_ppo_unnested;
-REFRESH MATERIALIZED VIEW ap_lpo_unnested;
-REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
+
 
 -- Gebäudeteile (Bauteil)
 INSERT INTO po_polygons(gml_id,thema,layer,polygon,signaturnummer,modell)

@@ -7,10 +7,7 @@ SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 
 SELECT 'Wege, Pfade und Steige werden verarbeitet.';
 
-REFRESH MATERIALIZED VIEW ap_pto_unnested;
-REFRESH MATERIALIZED VIEW ap_ppo_unnested;
-REFRESH MATERIALIZED VIEW ap_lpo_unnested;
-REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
+
 
 -- Linien
 INSERT INTO po_lines(gml_id,thema,layer,line,signaturnummer,modell)

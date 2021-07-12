@@ -54,7 +54,8 @@ except ImportError:
 
 BASEDIR = os.path.dirname(__file__)
 sys.path.insert(0, BASEDIR)
-alkisImportDlgBase = uic.loadUiType(os.path.join(BASEDIR, 'alkisImportDlg.ui'))[0]
+alkisImportDlgBase = uic.loadUiType(
+    os.path.join(BASEDIR, 'alkisImportDlg.ui'))[0]
 aboutDlgBase = uic.loadUiType(os.path.join(BASEDIR, 'about.ui'))[0]
 sys.path.pop(0)
 
@@ -76,7 +77,8 @@ os.putenv("OGR_ARC_MINLENGTH", "0.1")
 os.putenv("OGR_SKIP", "GML,SEGY")
 
 # Headerkennungen die NAS-Daten identifizieren
-os.putenv("NAS_INDICATOR", "NAS-Operationen;AAA-Fachschema;aaa.xsd;aaa-suite;adv/gid/6.0")
+os.putenv("NAS_INDICATOR",
+          "NAS-Operationen;AAA-Fachschema;aaa.xsd;aaa-suite;adv/gid/6.0")
 
 os.putenv("PGCLIENTENCODING", "UTF8")
 
@@ -161,18 +163,22 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
         self.leGT.setText(s.value("gt", "20000"))
         self.leGT.setValidator(QIntValidator(-1, 99999999))
 
-        self.cbxSkipFailures.setChecked(s.value("skipfailures", False, type=bool))
+        self.cbxSkipFailures.setChecked(
+            s.value("skipfailures", False, type=bool))
 
         checked = s.value("files_sf", []) or []
         for i in s.value("files", []) or []:
             item = QListWidgetItem(i)
             if not self.cbxSkipFailures.isChecked():
                 item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
-                item.setCheckState(Qt.Checked if i in checked else Qt.Unchecked)
+                item.setCheckState(
+                    Qt.Checked if i in checked else Qt.Unchecked)
             self.lstFiles.addItem(item)
 
-        self.cbFnbruch.setCurrentIndex(0 if s.value("fnbruch", True, type=bool) else 1)
-        self.cbPgVerdraengen.setCurrentIndex(1 if s.value("pgverdraengen", False, type=bool) else 0)
+        self.cbFnbruch.setCurrentIndex(
+            0 if s.value("fnbruch", True, type=bool) else 1)
+        self.cbPgVerdraengen.setCurrentIndex(
+            1 if s.value("pgverdraengen", False, type=bool) else 0)
         self.cbxUseCopy.setChecked(s.value("usecopy", True, type=bool))
         self.cbxAvoidDupes.setChecked(s.value("avoiddupes", False, type=bool))
         self.cbxCreate.setChecked(False)
@@ -190,7 +196,8 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
         self.cbEPSG.addItem("DHDN GK4 (BY)", "31468")
         self.cbEPSG.addItem("Soldner-Berlin (vortransformiert)", "3068")
         self.cbEPSG.addItem("Soldner-Berlin (transformieren)", "13068")
-        self.cbEPSG.setCurrentIndex(self.cbEPSG.findData(s.value("epsg", "25832")))
+        self.cbEPSG.setCurrentIndex(
+            self.cbEPSG.findData(s.value("epsg", "25832")))
 
         self.pbAdd.clicked.connect(self.selFiles)
         self.pbAddDir.clicked.connect(self.selDir)
@@ -217,8 +224,10 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
 
         self.status("")
 
-        self.restoreGeometry(s.value("geometry", QByteArray(), type=QByteArray))
-        self.splitter.restoreState(s.value("splitter", QByteArray(), type=QByteArray))
+        self.restoreGeometry(
+            s.value("geometry", QByteArray(), type=QByteArray))
+        self.splitter.restoreState(
+            s.value("splitter", QByteArray(), type=QByteArray))
 
         self.canceled = False
         self.running = False
@@ -234,7 +243,8 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
             if not line:
                 break
 
-            self.reFilter.append(re.compile("|".join([x.replace('\n', '') for x in line])))
+            self.reFilter.append(re.compile(
+                "|".join([x.replace('\n', '') for x in line])))
 
         f.close()
 
@@ -286,7 +296,8 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
         s = QSettings("norBIT", "norGIS-ALKIS-Import")
         lastDir = s.value("lastDir", ".")
 
-        files = QFileDialog.getOpenFileNames(self, "NAS-Dateien wählen", lastDir, "NAS-Dateien (*.xml *.xml.gz *.zip)")
+        files = QFileDialog.getOpenFileNames(
+            self, "NAS-Dateien wählen", lastDir, "NAS-Dateien (*.xml *.xml.gz *.zip)")
         if isinstance(files, tuple):
             files = files[0]
         if files is None:
@@ -309,9 +320,11 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
         s = QSettings("norBIT", "norGIS-ALKIS-Import")
         lastDir = s.value("lastDir", ".")
 
-        d = QFileDialog.getExistingDirectory(self, "Verzeichnis mit NAS-Dateien wählen", lastDir)
+        d = QFileDialog.getExistingDirectory(
+            self, "Verzeichnis mit NAS-Dateien wählen", lastDir)
         if d is None or d == '':
-            QMessageBox.critical(self, "norGIS-ALKIS-Import", "Kein eindeutiges Verzeichnis gewählt!", QMessageBox.Cancel)
+            QMessageBox.critical(self, "norGIS-ALKIS-Import",
+                                 "Kein eindeutiges Verzeichnis gewählt!", QMessageBox.Cancel)
             return
 
         s.setValue("lastDir", d)
@@ -336,7 +349,8 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
             self.lstFiles.takeItem(self.lstFiles.row(item))
 
     def saveList(self):
-        fn = QFileDialog.getSaveFileName(self, "Liste wählen", ".", "Dateilisten (*.lst)")
+        fn = QFileDialog.getSaveFileName(
+            self, "Liste wählen", ".", "Dateilisten (*.lst)")
         if isinstance(fn, tuple):
             fn = fn[0]
         if fn is None or fn == "":
@@ -351,7 +365,8 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
         f.close()
 
     def loadList(self):
-        fn = QFileDialog.getOpenFileName(self, "Liste wählen", ".", "Dateilisten (*.lst)")
+        fn = QFileDialog.getOpenFileName(
+            self, "Liste wählen", ".", "Dateilisten (*.lst)")
         if isinstance(fn, tuple):
             fn = fn[0]
         if fn is None or fn == "":
@@ -403,7 +418,8 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
             logqry = self.logqry
             self.logqry = None
 
-            self.log("Datenbank-Protokollierung fehlgeschlagen [{}: {}]".format(err, msg))
+            self.log(
+                "Datenbank-Protokollierung fehlgeschlagen [{}: {}]".format(err, msg))
             self.logqry = logqry
 
     def loadLog(self):
@@ -412,12 +428,14 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
 
         conn = self.connectDb()
         if not conn:
-            QMessageBox.critical(self, "norGIS-ALKIS-Import", "Konnte keine Datenbankverbindung aufbauen!", QMessageBox.Cancel)
+            QMessageBox.critical(self, "norGIS-ALKIS-Import",
+                                 "Konnte keine Datenbankverbindung aufbauen!", QMessageBox.Cancel)
             return
 
         qry = self.db.exec_("SELECT ts,msg FROM alkis_importlog ORDER BY n")
         if not qry:
-            QMessageBox.critical(self, "norGIS-ALKIS-Import", "Konnte Protokoll nicht abfragen!", QMessageBox.Cancel)
+            QMessageBox.critical(self, "norGIS-ALKIS-Import",
+                                 "Konnte Protokoll nicht abfragen!", QMessageBox.Cancel)
             return
 
         self.skipScroll = True
@@ -436,7 +454,8 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
         QApplication.restoreOverrideCursor()
 
     def saveLog(self):
-        save = QFileDialog.getSaveFileName(self, "Protokolldatei angeben", ".", "Protokoll-Dateien (*.log)")
+        save = QFileDialog.getSaveFileName(
+            self, "Protokolldatei angeben", ".", "Protokoll-Dateien (*.log)")
         if isinstance(save, tuple):
             save = save[0]
         if save is None or save == "":
@@ -573,7 +592,8 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
         return current + lastline
 
     def runProcess(self, args):
-        self.logDb("BEFEHL: '{}'".format(re.sub('password=\\S+', 'password=*removed*', "' '".join(args))))
+        self.logDb("BEFEHL: '{}'".format(
+            re.sub('password=\\S+', 'password=*removed*', "' '".join(args))))
 
         currout = ""
         currerr = ""
@@ -627,13 +647,18 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
     def runSQLScript(self, conn, fn, parallel=False):
         return self.runProcess([
             self.psql,
-            "-v", "alkis_epsg={}".format(3068 if self.epsg == 13068 else self.epsg),
+            "-v", "alkis_epsg={}".format(3068 if self.epsg ==
+                                         13068 else self.epsg),
             "-v", "alkis_schema={}".format(self.schema),
             "-v", "postgis_schema={}".format(self.pgschema),
-            "-v", "parent_schema={}".format(self.parentschema if self.parentschema else self.schema),
-            "-v", "alkis_fnbruch={}".format("true" if self.fnbruch else "false"),
-            "-v", "alkis_pgverdraengen={}".format("true" if self.pgverdraengen else "false"),
-            "-v", "alkis_avoiddupes={}".format("true" if self.avoiddupes else "false"),
+            "-v", "parent_schema={}".format(
+                self.parentschema if self.parentschema else self.schema),
+            "-v", "alkis_fnbruch={}".format(
+                "true" if self.fnbruch else "false"),
+            "-v", "alkis_pgverdraengen={}".format(
+                "true" if self.pgverdraengen else "false"),
+            "-v", "alkis_avoiddupes={}".format(
+                "true" if self.avoiddupes else "false"),
             "-v", "alkis_hist={}".format("true" if self.historie else "false"),
             "-v", "ON_ERROR_STOP=1",
             "-v", "ECHO=errors",
@@ -649,16 +674,19 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
             conn = "service={} ".format(self.leSERVICE.text())
         else:
             if self.leHOST.text() != '':
-                conn = "host={} port={} ".format(self.leHOST.text(), self.lePORT.text())
+                conn = "host={} port={} ".format(
+                    self.leHOST.text(), self.lePORT.text())
             else:
                 conn = ""
 
-        conn += "dbname={} user='{}' password='{}'".format(self.leDBNAME.text(), self.leUID.text(), self.lePWD.text())
+        conn += "dbname={} user='{}' password='{}'".format(
+            self.leDBNAME.text(), self.leUID.text(), self.lePWD.text())
 
         self.db = QSqlDatabase.addDatabase("QPSQL")
         self.db.setConnectOptions(conn)
         if not self.db.open():
-            self.log("Konnte Datenbankverbindung nicht aufbauen! [{}]".format(self.db.lastError().text()))
+            self.log("Konnte Datenbankverbindung nicht aufbauen! [{}]".format(
+                self.db.lastError().text()))
             return None
 
         self.db.exec_("SET STANDARD_CONFORMING_STRINGS TO ON")
@@ -666,9 +694,11 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
         self.schema = self.leSCHEMA.text()
         self.pgschema = self.lePGSCHEMA.text()
 
-        qry = self.db.exec_("SELECT 1 FROM pg_namespace WHERE nspname='{}'".format(self.schema.replace("'", "''")))
+        qry = self.db.exec_("SELECT 1 FROM pg_namespace WHERE nspname='{}'".format(
+            self.schema.replace("'", "''")))
         if not qry:
-            self.log("Konnte Schema nicht überprüfen! [{}]".format(qry.lastError().text()))
+            self.log("Konnte Schema nicht überprüfen! [{}]".format(
+                qry.lastError().text()))
             return None
 
         if not qry.next():
@@ -676,7 +706,8 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
                 self.log("Konnte Schema nicht erstellen!")
                 return None
 
-        self.db.exec_("SET search_path = \"{}\", \"{}\", public".format(self.schema, self.pgschema))
+        self.db.exec_("SET search_path = \"{}\", \"{}\", public".format(
+            self.schema, self.pgschema))
 
         return conn
 
@@ -778,27 +809,32 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
             self.db.exec_("SET application_name='ALKIS-Import - Frontend'")
             self.db.exec_("SET client_min_messages TO notice")
 
-            qry = self.db.exec_("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=current_schema() AND table_name='alkis_importlog'")
+            qry = self.db.exec_(
+                "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=current_schema() AND table_name='alkis_importlog'")
             if not qry or not qry.next():
                 self.log("Konnte Existenz von Protokolltabelle nicht überprüfen.")
                 break
 
             if int(qry.value(0)) == 0:
-                qry = self.db.exec_("CREATE TABLE alkis_importlog(n SERIAL PRIMARY KEY, ts timestamp default now(), msg text)")
+                qry = self.db.exec_(
+                    "CREATE TABLE alkis_importlog(n SERIAL PRIMARY KEY, ts timestamp default now(), msg text)")
                 if not qry:
-                    self.log("Konnte Protokolltabelle nicht anlegen [{}]".format(qry.lastError().text()))
+                    self.log("Konnte Protokolltabelle nicht anlegen [{}]".format(
+                        qry.lastError().text()))
                     break
             elif self.cbxClearProtocol.isChecked():
                 qry = self.db.exec_("TRUNCATE alkis_importlog")
                 if not qry:
-                    self.log("Konnte Protokolltabelle nicht leeren [{}]".format(qry.lastError().text()))
+                    self.log("Konnte Protokolltabelle nicht leeren [{}]".format(
+                        qry.lastError().text()))
                     break
                 self.cbxClearProtocol.setChecked(False)
                 self.log("Protokolltabelle gelöscht.")
 
             self.logqry = QSqlQuery(self.db)
             if not self.logqry.prepare("INSERT INTO alkis_importlog(msg) VALUES (?)"):
-                self.log("Konnte Protokollierungsanweisung nicht vorbereiten [{}]".format(qry.lastError().text()))
+                self.log("Konnte Protokollierungsanweisung nicht vorbereiten [{}]".format(
+                    qry.lastError().text()))
                 self.logqry = None
                 break
 
@@ -828,18 +864,21 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
 
             self.log("PostGIS-Version: {}".format(qry.value(0)))
 
-            qry = self.db.exec_("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=current_schema() AND table_name='ax_flurstueck'")
+            qry = self.db.exec_(
+                "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=current_schema() AND table_name='ax_flurstueck'")
             if not qry or not qry.next():
                 self.log("Konnte Existenz des ALKIS-Schema nicht überprüfen.")
                 break
 
             if not self.cbxCreate.isChecked():
                 if int(qry.value(0)) == 0:
-                    self.log("Keine ALKIS-Daten vorhanden - Datenbestand muß angelegt werden.")
+                    self.log(
+                        "Keine ALKIS-Daten vorhanden - Datenbestand muß angelegt werden.")
                     break
 
                 if not qry.exec_("SELECT find_srid(current_schema()::text,'ax_flurstueck','wkb_geometry')") or not qry.next():
-                    self.log("Konnte Koordinatensystem der vorhandenen Datenbank nicht bestimmen.")
+                    self.log(
+                        "Konnte Koordinatensystem der vorhandenen Datenbank nicht bestimmen.")
                     break
 
                 self.epsg = int(qry.value(0))
@@ -859,7 +898,8 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
                 break
 
             for i in range(n, self.lwProtocol.count()):
-                m = re.search("GDAL (\\d+)\\.(\\d+)", self.lwProtocol.item(i).text())
+                m = re.search("GDAL (\\d+)\\.(\\d+)",
+                              self.lwProtocol.item(i).text())
                 if m:
                     break
 
@@ -916,7 +956,8 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
                         f = ZipFile(fn, "r")
                         il = f.infolist()
                         if len(il) != 1:
-                            raise ProcessError("ZIP-Archiv {} enthält mehr als eine Datei!".format(fn))
+                            raise ProcessError(
+                                "ZIP-Archiv {} enthält mehr als eine Datei!".format(fn))
                         s = il[0].file_size
                         sizes[fn[:extl] + ".xml"] = s
 
@@ -943,7 +984,8 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
 
                 self.pbProgress.setVisible(False)
 
-                self.log("Gesamtgröße des Imports: {}".format(self.memunits(ts)))
+                self.log("Gesamtgröße des Imports: {}".format(
+                    self.memunits(ts)))
 
                 self.pbProgress.setRange(0, 10000)
                 self.pbProgress.setValue(0)
@@ -1056,7 +1098,8 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
                             src += ".xml"
 
                         if src not in sizes:
-                            self.logDb("Größe der Datei {} nicht gefunden.".format(src))
+                            self.logDb(
+                                "Größe der Datei {} nicht gefunden.".format(src))
                             break
 
                         size = sizes[src]
@@ -1104,20 +1147,24 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
                     ]
 
                     if GDAL_MAJOR < 3 or (GDAL_MAJOR == 3 and GDAL_MINOR < 1):
-                        args.append("PG:{} active_schema={}','{}".format(conn, self.schema, self.pgschema))
+                        args.append("PG:{} active_schema={}','{}".format(
+                            conn, self.schema, self.pgschema))
                     else:
-                        args.append("PG:{0} schemas='{1},{2}' active_schema={1}".format(conn, self.schema, self.pgschema))
+                        args.append("PG:{0} schemas='{1},{2}' active_schema={1}".format(
+                            conn, self.schema, self.pgschema))
 
                     if int(self.leGT.text() or '0') >= 1:
                         args.extend(["-gt", self.leGT.text()])
 
                     if GDAL_MAJOR >= 3:
                         if self.epsg == 131466 or self.epsg == 131467 or self.epsg == 131468:
-                            args.extend(["-a_srs", os.path.join(BASEDIR, "{}.wkt2".format(self.epsg))])
+                            args.extend(
+                                ["-a_srs", os.path.join(BASEDIR, "{}.wkt2".format(self.epsg))])
 
                         elif self.epsg == 31466 or self.epsg == 31467 or self.epsg == 31468:
                             args.extend([
-                                "-s_srs", os.path.join(BASEDIR, "1{}.wkt2".format(self.epsg)),
+                                "-s_srs", os.path.join(BASEDIR,
+                                                       "1{}.wkt2".format(self.epsg)),
                                 "-t_srs", "EPSG:{}".format(self.epsg)
                             ])
 
@@ -1128,10 +1175,12 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
                             ])
 
                         else:
-                            args.extend(["-a_srs", "EPSG:{}".format(self.epsg)])
+                            args.extend(
+                                ["-a_srs", "EPSG:{}".format(self.epsg)])
 
                     elif self.epsg == 131466 or self.epsg == 131467 or self.epsg == 131468:
-                        args.extend(["-a_srs", "+init=custom:{}".format(self.epsg)])
+                        args.extend(
+                            ["-a_srs", "+init=custom:{}".format(self.epsg)])
                         os.putenv("PROJ_LIB", ".")
 
                     elif self.epsg == 31466 or self.epsg == 31467 or self.epsg == 31468:
@@ -1152,15 +1201,19 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
                         args.extend(["-a_srs", "EPSG:{}".format(self.epsg)])
 
                     if self.cbxSkipFailures.isChecked() or fn in checked:
-                        args.extend(["-skipfailures", "--config", "PG_USE_COPY", "NO"])
+                        args.extend(
+                            ["-skipfailures", "--config", "PG_USE_COPY", "NO"])
                     else:
-                        args.extend(["--config", "PG_USE_COPY", "YES" if self.cbxUseCopy.isChecked() else "NO"])
+                        args.extend(
+                            ["--config", "PG_USE_COPY", "YES" if self.cbxUseCopy.isChecked() else "NO"])
 
-                    args.extend(["-nlt", "CONVERT_TO_LINEAR", "-ds_transaction"])
+                    args.extend(
+                        ["-nlt", "CONVERT_TO_LINEAR", "-ds_transaction"])
 
                     args.append(src)
 
-                    self.status("{} mit {} wird importiert...".format(fn, self.memunits(size)))
+                    self.status("{} mit {} wird importiert...".format(
+                        fn, self.memunits(size)))
 
                     t1 = QElapsedTimer()
                     t1.start()
@@ -1175,7 +1228,8 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
                     elapsed = t1.elapsed()
 
                     if elapsed > 0:
-                        throughput = " ({}/s)".format(self.memunits(size * 1000 / elapsed))
+                        throughput = " ({}/s)".format(
+                            self.memunits(size * 1000 / elapsed))
                     else:
                         throughput = ""
 
@@ -1224,22 +1278,68 @@ class alkisImportDlg(QDialog, alkisImportDlgBase):
                     ok = self.rund(conn, "postprocessing")
 
                 if ok:
+                    self.status("Refresh Materialized View ap_pto_unnested")
+                    ok = self.db.exec_(
+                        "REFRESH MATERIALIZED VIEW ap_pto_unnested")
+                    if ok:
+                        self.log("Refreshed Materialized View ap_pto_unnested")
+                    else:
+                        self.log(
+                            "Could not refresh Materialized View ap_pto_unnested")
+
+                if ok:
+                    self.status("Refresh Materialized View ap_ppo_unnested")
+                    ok = self.db.exec_(
+                        "REFRESH MATERIALIZED VIEW ap_ppo_unnested")
+                    if ok:
+                        self.log("Refreshed Materialized View ap_ppo_unnested")
+                    else:
+                        self.log(
+                            "Could not refresh Materialized View ap_ppo_unnested")
+
+                if ok:
+                    self.status("Refresh Materialized View ap_lpo_unnested")
+                    ok = self.db.exec_(
+                        "REFRESH MATERIALIZED VIEW ap_lpo_unnested")
+                    if ok:
+                        self.log("Refreshed Materialized View ap_lpo_unnested")
+                    else:
+                        self.log(
+                            "Could not refresh Materialized View ap_lpo_unnested")
+
+                if ok:
+                    self.status(
+                        "Refresh Materialized View ap_darstellung_unnested")
+                    ok = self.db.exec_(
+                        "REFRESH MATERIALIZED VIEW ap_darstellung_unnested")
+                    if ok:
+                        self.log(
+                            "Refreshed Materialized View ap_darstellung_unnested")
+                    else:
+                        self.log(
+                            "Could not refresh Materialized View ap_darstellung_unnested")
+
+                if ok:
                     self.status("VACUUM...")
                     ok = self.db.exec_("VACUUM")
                     if ok:
                         self.log("VACUUM abgeschlossen.")
 
                 if ok:
-                    self.log("Import nach {} erfolgreich beendet.".format(self.timeunits(t0.elapsed())))
+                    self.log("Import nach {} erfolgreich beendet.".format(
+                        self.timeunits(t0.elapsed())))
                 else:
-                    self.log("Import nach {} abgebrochen.".format(self.timeunits(t0.elapsed())))
+                    self.log("Import nach {} abgebrochen.".format(
+                        self.timeunits(t0.elapsed())))
 
             except Exception:
                 exc_type, exc_value, exc_traceback = sys.exc_info()
                 try:
-                    err = "\n> ".join([x.decode("utf-8", 'replace') for x in traceback.format_exception(exc_type, exc_value, exc_traceback)])
+                    err = "\n> ".join([x.decode(
+                        "utf-8", 'replace') for x in traceback.format_exception(exc_type, exc_value, exc_traceback)])
                 except AttributeError:
-                    err = "\n> ".join([x for x in traceback.format_exception(exc_type, exc_value, exc_traceback)])
+                    err = "\n> ".join([x for x in traceback.format_exception(
+                        exc_type, exc_value, exc_traceback)])
                 if sys.stdout:
                     print(err)
                 self.log("Abbruch nach Fehler\n> {}".format(str(err)))

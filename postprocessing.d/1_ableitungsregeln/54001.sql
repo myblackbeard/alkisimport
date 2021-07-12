@@ -7,10 +7,6 @@ SET search_path = :"alkis_schema", :"parent_schema", :"postgis_schema", public;
 
 SELECT 'Vegetationsmerkmale werden verarbeitet.';
 
-REFRESH MATERIALIZED VIEW ap_pto_unnested;
-REFRESH MATERIALIZED VIEW ap_ppo_unnested;
-REFRESH MATERIALIZED VIEW ap_lpo_unnested;
-REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
 
 -- Punkte
 INSERT INTO po_points(gml_id,thema,layer,point,drehwinkel,signaturnummer,modell)
