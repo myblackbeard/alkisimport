@@ -389,3 +389,8 @@ ANALYZE ap_lpo;
 ANALYZE ap_pto;
 ANALYZE ap_lto;
 ANALYZE ap_darstellung;
+
+REFRESH MATERIALIZED VIEW ap_pto_unnested;
+REFRESH MATERIALIZED VIEW ap_ppo_unnested;
+REFRESH MATERIALIZED VIEW ap_lpo_unnested;
+REFRESH MATERIALIZED VIEW ap_darstellung_unnested;
