@@ -28,8 +28,8 @@ FROM (
 		coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 	FROM ax_lagebezeichnungmitpseudonummer o
 	JOIN ax_gebaeude g ON g.gehoertzu=o.gml_id AND g.endet IS NULL
-	LEFT OUTER JOIN ap_pto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.endet IS NULL AND t.art='PNR'
-	LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.endet IS NULL AND d.art='PNR'
+	LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.endet IS NULL AND t.art='PNR'
+	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.endet IS NULL AND d.art='PNR'
 	WHERE o.endet IS NULL
 ) AS foo;
 
@@ -45,6 +45,6 @@ SELECT
 	drehwinkel, horizontaleausrichtung, vertikaleausrichtung, skalierung, fontsperrung,
 	coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 FROM ax_lagebezeichnungmitpseudonummer o
-JOIN ap_pto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.endet IS NULL AND t.art='Ort' AND schriftinhalt IS NOT NULL
+JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.endet IS NULL AND t.art='Ort' AND schriftinhalt IS NOT NULL
 WHERE o.endet IS NULL;
 
