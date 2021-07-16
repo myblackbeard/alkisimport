@@ -22560,6 +22560,17 @@ CREATE INDEX ix_ogc_fid_ap_lpo_unnested ON ap_lpo_unnested(ogc_fid);
 CREATE INDEX ix_endet_ap_lpo_unnested ON ap_lpo_unnested(endet);
 CREATE INDEX ix_art_ap_lpo_unnested ON ap_lpo_unnested(art);
 
+CREATE MATERIALIZED VIEW ax_gelaendekante_unnested AS 
+     SELECT a.*, u.istteilvon::text AS istteilvon_unnested
+     FROM ax_gelaendekante a 
+     JOIN (SELECT ogc_fid, unnest(istteilvon) as istteilvon FROM ax_gelaendekante) u on a.ogc_fid = u.ogc_fid;
+
+CREATE INDEX ix_istteilvon_ax_gelaendekante_unnested ON ax_gelaendekante_unnested(istteilvon_unnested);
+CREATE INDEX ix_artdergelaendgekante_ax_gelaendekante_unnested ON ax_gelaendekante_unnested(artdergelaendekante);
+CREATE INDEX ix_endet_ax_gelaendekante_unnested ON ax_gelaendekante_unnested(endet);
+
+
+
 -- CREATE OR REPLACE FUNCTION tg_refresh_ap_darstellung_unnested()
 -- RETURNS trigger LANGUAGE plpgsql AS $$
 -- BEGIN

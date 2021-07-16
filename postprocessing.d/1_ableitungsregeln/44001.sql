@@ -33,7 +33,7 @@ SELECT
 	coalesce(p.signaturnummer,'3488') AS signaturnummer,
 	coalesce(p.advstandardmodell||p.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 FROM ax_fliessgewaesser o
-JOIN ap_ppo p ON ARRAY[o.gml_id] <@ p.dientzurdarstellungvon AND p.art='Fließpfeil' AND p.endet IS NULL
+JOIN ap_ppo_unnested p ON o.gml_id = p.dientzurdarstellungvon_unnested AND p.art='Fließpfeil' AND p.endet IS NULL
 WHERE o.endet IS NULL AND coalesce(zustand,0)<>4000;
 
 -- Fließgewäesser, Symbol
@@ -50,6 +50,6 @@ SELECT
 		o.advstandardmodell||o.sonstigesmodell
 	) AS modell
 FROM ax_fliessgewaesser o
-LEFT OUTER JOIN ap_ppo p ON ARRAY[o.gml_id] <@ p.dientzurdarstellungvon AND p.art='FKT' AND p.endet IS NULL
-LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art='FKT' AND d.endet IS NULL
+LEFT OUTER JOIN ap_ppo_unnested p ON o.gml_id = p.dientzurdarstellungvon_unnested AND p.art='FKT' AND p.endet IS NULL
+LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art='FKT' AND d.endet IS NULL
 WHERE o.endet IS NULL AND funktion=8300 AND zustand=4000;
