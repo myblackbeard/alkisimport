@@ -18,8 +18,8 @@ SELECT
 	coalesce(d.signaturnummer,p.signaturnummer,'3623') AS signaturnummer,
 	coalesce(p.advstandardmodell||p.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 FROM ax_wasserspiegelhoehe o
-LEFT OUTER JOIN ap_ppo p ON ARRAY[o.gml_id] <@ p.dientzurdarstellungvon AND p.art='SYMBOL' AND p.endet IS NULL
-LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art='SYMBOL' AND d.endet IS NULL
+LEFT OUTER JOIN ap_ppo_unnested p ON o.gml_id = p.dientzurdarstellungvon_unnested AND p.art='SYMBOL' AND p.endet IS NULL
+LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art='SYMBOL' AND d.endet IS NULL
 WHERE o.endet IS NULL AND NOT hoehedeswasserspiegels IS NULL;
 
 -- Wasserspiegeltext
@@ -36,6 +36,6 @@ SELECT
 	vertikaleausrichtung,skalierung,fontsperrung,
 	coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 FROM ax_wasserspiegelhoehe o
-LEFT OUTER JOIN ap_pto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.art='HWS' AND t.endet IS NULL
-LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art='HWS' AND d.endet IS NULL
+LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.art='HWS' AND t.endet IS NULL
+LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art='HWS' AND d.endet IS NULL
 WHERE o.endet IS NULL AND NOT hoehedeswasserspiegels IS NULL;

@@ -179,23 +179,23 @@ UPDATE po_points
 		);
 
 -- RP-Flurstücksnummern mit ap_pto.art=NULL mit Bruchstrich 3m nach Norden schieben
-UPDATE po_labels
-	SET
+UPDATE po_labels 
+	SET 
 		layer='ax_flurstueck_nummer_rpnoart',
 		point=st_translate(point,0,3)
-	FROM ap_pto t
-	WHERE po_labels.gml_id LIKE 'DERP%'
-		AND layer='ax_flurstueck_nummer'
-		AND ARRAY[po_labels.gml_id] <@ t.dientzurdarstellungvon AND t.endet IS NULL AND t.art IS NULL;
+	FROM ap_pto_unnested t
+	WHERE po_labels.gml_id LIKE 'DERP%' 
+		AND layer='ax_flurstueck_nummer' 
+		AND po_labels.gml_id = t.dientzurdarstellungvon_unnested AND t.endet IS NULL AND t.art IS NULL;
 
 UPDATE po_lines
 	SET
 		layer='ax_flurstueck_nummer_rpnoart',
 		line=st_translate(line,0,3)
-	FROM ap_pto t
+	FROM ap_pto_unnested t
 	WHERE po_lines.gml_id LIKE 'DERP%'
 	  AND layer='ax_flurstueck_nummer'
-	  AND ARRAY[po_lines.gml_id] <@ t.dientzurdarstellungvon AND t.endet IS NULL AND t.art IS NULL;
+	  AND po_lines.gml_id = t.dientzurdarstellungvon_unnested AND t.endet IS NULL AND t.art IS NULL;
 
 SELECT 'Lösche nicht darzustellende Signaturen...';
 

@@ -31,7 +31,7 @@ SELECT
 	coalesce(p.signaturnummer,'3587') AS signaturnummer,
 	coalesce(p.advstandardmodell||p.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 FROM ax_gleis o
-JOIN ap_ppo p ON ARRAY[o.gml_id] <@ p.dientzurdarstellungvon AND p.art='ART' AND p.endet IS NULL
+JOIN ap_ppo_unnested p ON o.gml_id = p.dientzurdarstellungvon_unnested AND p.art='ART' AND p.endet IS NULL
 WHERE o.endet IS NULL AND geometrytype(o.wkb_geometry) IN ('POLYGON','MULTIPOLYGON') AND NOT bahnkategorie IS NULL AND o.art=1200;
 
 -- Gleis, Punktsignaturen auf Linien

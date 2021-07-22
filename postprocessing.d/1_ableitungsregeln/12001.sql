@@ -169,7 +169,7 @@ SELECT
 	horizontaleausrichtung, vertikaleausrichtung, skalierung, fontsperrung,
 	coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 FROM ax_lagebezeichnungohnehausnummer o
-JOIN ap_lto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.art IN ('Strasse','Weg') AND t.endet IS NULL AND coalesce(t.signaturnummer,'')<>'6000'
+JOIN ap_lto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.art IN ('Strasse','Weg') AND t.endet IS NULL AND coalesce(t.signaturnummer,'')<>'6000'
 WHERE o.endet IS NULL;
 
 -- Platz/Bahnverkehr, Text auf Linien
@@ -189,7 +189,7 @@ SELECT
 	horizontaleausrichtung, vertikaleausrichtung, skalierung, fontsperrung,
 	coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 FROM ax_lagebezeichnungohnehausnummer o
-JOIN ap_lto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.art IN ('Platz','Bahnverkehr') AND t.endet IS NULL AND coalesce(t.signaturnummer,'')<>'6000'
+JOIN ap_lto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.art IN ('Platz','Bahnverkehr') AND t.endet IS NULL AND coalesce(t.signaturnummer,'')<>'6000'
 WHERE o.endet IS NULL;
 
 -- Fließgewässer/Stehendes Gewässer, Text auf Linien
@@ -209,5 +209,5 @@ SELECT
 	horizontaleausrichtung, vertikaleausrichtung, skalierung, fontsperrung,
 	coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 FROM ax_lagebezeichnungohnehausnummer o
-JOIN ap_lto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.art IN ('Fliessgewaesser','StehendesGewaesser') AND t.endet IS NULL
+JOIN ap_lto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.art IN ('Fliessgewaesser','StehendesGewaesser') AND t.endet IS NULL
 WHERE o.endet IS NULL;

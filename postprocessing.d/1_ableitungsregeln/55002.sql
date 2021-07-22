@@ -146,8 +146,8 @@ FROM (
 		drehwinkel,horizontaleausrichtung,vertikaleausrichtung,skalierung,fontsperrung,
 		coalesce(t.advstandardmodell||t.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 	FROM ax_untergeordnetesgewaesser o
-	LEFT OUTER JOIN ap_pto t ON ARRAY[o.gml_id] <@ t.dientzurdarstellungvon AND t.art='OFL' AND t.endet IS NULL
-	LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art='OFL' AND d.endet IS NULL
+	LEFT OUTER JOIN ap_pto_unnested t ON o.gml_id = t.dientzurdarstellungvon_unnested AND t.art='OFL' AND t.endet IS NULL
+	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art='OFL' AND d.endet IS NULL
 	WHERE o.endet IS NULL AND lagezurerdoberflaeche IN (1800,1810)
 ) AS o
 WHERE NOT text IS NULL;

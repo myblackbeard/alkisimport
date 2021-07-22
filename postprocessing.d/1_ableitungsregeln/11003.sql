@@ -95,6 +95,6 @@ SELECT
 FROM ax_grenzpunkt p
 JOIN po_punktortta_istteilvon itv ON p.gml_id=itv.istteilvon
 JOIN ax_punktortta o ON itv.gml_id=o.gml_id AND o.endet IS NULL
-LEFT OUTER JOIN ap_pto t ON ARRAY[p.gml_id] <@ t.dientzurdarstellungvon AND t.endet IS NULL
-LEFT OUTER JOIN ap_darstellung d ON ARRAY[p.gml_id] <@ d.dientzurdarstellungvon AND d.endet IS NULL
+LEFT OUTER JOIN ap_pto_unnested t ON p.gml_id = t.dientzurdarstellungvon_unnested AND t.endet IS NULL
+LEFT OUTER JOIN ap_darstellung_unnested d ON p.gml_id = d.dientzurdarstellungvon_unnested AND d.endet IS NULL
 WHERE coalesce(besonderePunktnummer,'')<>'' AND p.endet IS NULL;

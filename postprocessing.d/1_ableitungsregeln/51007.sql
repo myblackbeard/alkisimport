@@ -76,8 +76,8 @@ FROM (
 		) AS signaturnummer,
 		coalesce(p.advstandardmodell||p.sonstigesmodell,o.advstandardmodell||o.sonstigesmodell) AS modell
 	FROM ax_historischesbauwerkoderhistorischeeinrichtung o
-	LEFT OUTER JOIN ap_ppo p ON ARRAY[o.gml_id] <@ p.dientzurdarstellungvon AND p.art='ATP' AND p.endet IS NULL
-	LEFT OUTER JOIN ap_darstellung d ON ARRAY[o.gml_id] <@ d.dientzurdarstellungvon AND d.art='ATP' AND d.endet IS NULL
+	LEFT OUTER JOIN ap_ppo_unnested p ON o.gml_id = p.dientzurdarstellungvon_unnested AND p.art='ATP' AND p.endet IS NULL
+	LEFT OUTER JOIN ap_darstellung_unnested d ON o.gml_id = d.dientzurdarstellungvon_unnested AND d.art='ATP' AND d.endet IS NULL
 	WHERE o.endet IS NULL
 ) AS o
 WHERE NOT signaturnummer IS NULL;

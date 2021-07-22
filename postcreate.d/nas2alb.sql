@@ -510,6 +510,6 @@ CREATE VIEW v_haeuser AS
       to_char(alkis_toint(o.land),'fm00')||o.regierungsbezirk||to_char(alkis_toint(o.kreis),'fm00')||to_char(alkis_toint(o.gemeinde),'fm000')||'    '||trim(o.lage) AS strshl,
       hausnummer AS ha_nr
     FROM ax_lagebezeichnungmithausnummer o
-    JOIN ax_gebaeude g ON ARRAY[o.gml_id] <@ g.zeigtauf AND g.endet IS NULL
+    JOIN ax_gebaeude_unnested g ON o.gml_id = g.zeigtAuf_unnested AND g.endet IS NULL
     WHERE o.endet IS NULL
   ) AS foo;

@@ -10,10 +10,11 @@ SELECT alkis_fixareas('ax_flurstueck');
 SELECT 'Übertrage Flurstücke...';
 
 DELETE FROM flurst;
-INSERT INTO flurst(flsnr,flsnrk,gemashl,flr,entst,fortf,flsfl,amtlflsfl,gemflsfl,af,flurknr,baublock,flskoord,fora,fina,h1shl,h2shl,hinwshl,strshl,gemshl,hausnr,lagebez,k_anlverm,anl_verm,blbnr,n_flst,ff_entst,ff_stand,ff_datum)
+WITH tmp as (SELECT alkis_flsnr(a) as flsnr, alkis_flsnrk(a) AS flsnrk, alkis_flskoord(a) AS flskoord, * from ax_flurstueck a)
+--INSERT INTO flurst(flsnr,flsnrk,gemashl,flr,entst,fortf,flsfl,amtlflsfl,gemflsfl,af,flurknr,baublock,flskoord,fora,fina,h1shl,h2shl,hinwshl,strshl,gemshl,hausnr,lagebez,k_anlverm,anl_verm,blbnr,n_flst,ff_entst,ff_stand,ff_datum)
    SELECT
-     alkis_flsnr(a) AS flsnr,
-     alkis_flsnrk(a) AS flsnrk,
+     flsnr AS flsnr,
+     flsnrk,
      to_char(alkis_toint(a.land),'fm00') || to_char(alkis_toint(a.gemarkungsnummer),'fm0000') AS gemashl,
      to_char(coalesce(a.flurnummer,0),'fm000') AS flr,
      to_char(date_part('year', a.zeitpunktderentstehung), 'fm0000') || '/     -  ' AS entst,
@@ -24,7 +25,7 @@ INSERT INTO flurst(flsnr,flsnrk,gemashl,flr,entst,fortf,flsfl,amtlflsfl,gemflsfl
      '01' AS af,
      NULL AS flurknr,
      NULL AS baublock,
-     alkis_flskoord(a) AS flskoord,
+     flskoord,
      NULL AS fora,
      NULL AS fina,
      NULL AS h1shl,
@@ -45,14 +46,14 @@ INSERT INTO flurst(flsnr,flsnrk,gemashl,flr,entst,fortf,flsfl,amtlflsfl,gemflsfl
      0 AS ff_entst,
      0 AS ff_stand,
      NULL AS ff_datum
-   FROM ax_flurstueck a
+   FROM tmp a
    WHERE a.endet IS NULL
      -- Workaround für gleiche Bestände von mehreren Katasterämtern
      AND NOT EXISTS (
 	SELECT *
 	FROM ax_flurstueck b
 	WHERE b.endet IS NULL
-	  AND alkis_flsnr(a)=alkis_flsnr(b)
+	  AND flsnr=alkis_flsnr(b)
 	  AND b.beginnt<a.beginnt
 	  AND a.ogc_fid<>b.ogc_fid
 	)
