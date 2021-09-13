@@ -10,9 +10,10 @@ SELECT alkis_fixareas('ax_flurstueck');
 SELECT 'Übertrage Flurstücke...';
 
 DELETE FROM flurst;
+EXPLAIN ANALYZE
 WITH tmp as (SELECT alkis_flsnr(a) as flsnr, alkis_flsnrk(a) AS flsnrk, alkis_flskoord(a) AS flskoord, * from ax_flurstueck a)
 --INSERT INTO flurst(flsnr,flsnrk,gemashl,flr,entst,fortf,flsfl,amtlflsfl,gemflsfl,af,flurknr,baublock,flskoord,fora,fina,h1shl,h2shl,hinwshl,strshl,gemshl,hausnr,lagebez,k_anlverm,anl_verm,blbnr,n_flst,ff_entst,ff_stand,ff_datum)
-   SELECT
+    SELECT
      flsnr AS flsnr,
      flsnrk,
      to_char(alkis_toint(a.land),'fm00') || to_char(alkis_toint(a.gemarkungsnummer),'fm0000') AS gemashl,
